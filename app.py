@@ -1,14 +1,23 @@
-import os
+import streamlit as st
 from transformers import pipeline
 
-print("Connexion au cerveau de l'IA en cours...")
-generateur = pipeline("text-generation", model="facebook/opt-1.3b")
+# 1. On crée le titre de ton application web
+st.title("Mon IA Universelle 🚀")
+st.write("Pose-moi n'importe quelle question, dans n'importe quelle langue !")
 
-def poser_une_question(question):
-    print(f"\nQuestion : {question}")
-    reponse = generateur(question, max_length=150, num_return_sequences=1)
-    print("\n--- Réponse de ton IA ---")
-    print(reponse[0]['generated_text'])
+# 2. On charge le modèle d'IA gratuit en mémoire
+@st.cache_resource # Cette ligne évite de recharger l'IA à chaque fois
+def charger_ia():
+    return pipeline("text-generation", model="facebook/opt-1.3b")
 
-ma_question = "Explique-moi comment fonctionne le système solaire."
-poser_une_question(ma_question)
+generateur = charger_ia()
+
+# 3. On crée la zone de texte pour l'utilisateur
+question = st.text_input("Écris ta question ici :", "")
+
+# 4. Quand l'utilisateur valide, l'IA lui répond
+if question:
+    with st.spinner("L'IA réfléchit..."):
+        reponse = generateur(question, max_length=100)
+        st.subheader("Réponse :")
+        st.write(reponse[0]['generated_text'])
